@@ -1,0 +1,16 @@
+SetOutputFilter DEFLATE
+<IfModule mod_expires.c>
+# mod_expires
+ExpiresActive on
+ExpiresDefault A31536000
+ExpiresBytype text/css "access plus 365 days"
+ExpiresByType text/javascript "access plus 365 days"
+ExpiresByType application/x-javascript "access plus 365 days"
+ExpiresByType application/x-shockwave-flash "access plus 365 days"
+ExpiresByType image/* "access plus 365 days"
+<FilesMatch ".(flv|ico|pdf|avi|mov|ppt|doc|mp3|wmv|wav|jpg|gif|png)$">
+    ExpiresDefault A31536000
+    Header set Cache-Control "max-age=31536000, public"
+</FilesMatch>
+</IfModule>
+
