@@ -1,17 +1,54 @@
 <?php
-require_once('smarty3/Smarty.class.php');
+namespace yii\smarty;
+use Yii;
+use Smarty;
 
 class smarty3 extends Smarty {
-    public $yii = null;
+    // need to set template path alias first
+    public $templatePath = '@template';
+    /**
+     * @var string the directory or path alias pointing to where Smarty cache will be stored.
+     */
+    public $cachePath = '@runtime/Smarty/cache';
+    /**
+     * @var string the directory or path alias pointing to where Smarty compiled templates will be stored.
+     */
+    public $compilePath = '@runtime/Smarty/compile';
+    /**
+     * @var array Add additional directories to Smarty's search path for plugins.
+     */
+    public $pluginDirs = [
+        '@vendor/smarty/smarty/custom'
+    ];
+    /**
+     * @var array Class imports similar to the use tag
+     */
+    public $imports = [];
+    /**
+     * @var array Widget declarations
+     */
+    public $widgets = ['functions' => [], 'blocks' => []];
+    /**
+     * @var array additional Smarty options
+     * @see http://www.smarty.net/docs/en/api.variables.tpl
+     */
+    public $options = [];
+    /**
+     * @var string extension class name
+     */
+    public $extensionClass = '\yii\smarty\Extension';
+    /**
+     * @var Smarty The Smarty object used for rendering
+     */
+    protected $smarty;
 
     public function __construct(array $options=array()) {
         parent::__construct($options);
-        spl_autoload_unregister('smartyAutoload');
-        Yii::registerAutoloader('smartyAutoload');
-        $this->setTemplateDir(DIR_ROOT . '/protected/templates/');
-        $this->setCompileDir(DIR_ROOT . '/protected/runtime/smarty/compile/');
+        $this->setCompileDir(Yii::getAlias($this->compilePath));
+        $this->setCacheDir(Yii::getAlias($this->cachePath));
         //$this->setConfigDir(DIR_ROOT . '/protected/runtime/smarty/config/');
-        $this->setCacheDir(DIR_ROOT . '/protected/runtime/smarty/cache/');
+        $this->setTemplateDir(Yii::getAlias($this->templatePath));
+
         $this->caching = false;
         //$this->cache_lifetime = 6;
 
@@ -26,41 +63,35 @@ class smarty3 extends Smarty {
         $this->left_delimiter = '{%';
         $this->right_delimiter = '%}';
 
-        $this->addPluginsDir(dirname(__FILE__) . '/smarty3/custom/');
+        $this->addPluginsDir($this->pluginDirs);
 
         // 打开默认过滤
         $this->escape_html = true;
     }
 
+
+
     public function init() {
-        $this->yii = Yii::app();
     }
 
     public function staticFileMap($file, $type, $module='', $debug=YII_DEBUG) {
-        if ($module) {
-            $module = '/' . $module;
-            $moduleBase = DIR_ROOT . '/protected/modules/' . $module . '/';
-        } else {
-            $module = '';
-            $moduleBase = DIR_ROOT . '/protected/';
-        }
-
+        $module = $module ? '/' . $module : '';
         if ($debug) {
             $ret = array(
-                'realFile' => $moduleBase . $file,
-                'webFile' => $module . '/' . $file,
+                'realFile' => Yii::getAlias('@webroot')  . '/' . $file,
+                'webFile' => $file,
                 'type' => $type,
             );
         } else {
             if ($type === 'css' || $type === 'less') {
                 $ret = array(
-                    'realFile' => DIR_ROOT . $module . '/static/css/all.css',
-                    'webFile' => $module . '/static/css/all.css',
+                    'realFile' => Yii::getAlias('@webroot') . '/assets/css/all.css',
+                    'webFile' => Yii::getAlias('@webroot') . $module . '/assets/css/all.css',
                     'type' => 'css',
                 );
             } elseif ($type === 'js') {
                 $ret = array(
-                    'realFile' => DIR_ROOT . $module . '/' . $file,
+                    'realFile' => Yii::getAlias('@webroot') . $module . '/' . $file,
                     'webFile' => $module . '/' . $file,
                     'type' => $type,
                 );
