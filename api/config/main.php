@@ -1,7 +1,5 @@
 <?php
 $params = array_merge(
-    require(__DIR__ . '/../../common/config/params.php'),
-    require(__DIR__ . '/../../common/config/params-local.php'),
     require(__DIR__ . '/params.php'),
     require(__DIR__ . '/params-local.php')
 );
@@ -17,9 +15,9 @@ return [
     ],
     'components' => [
         'user' => [
-            'identityClass' => 'common\models\User',
-            'enableAutoLogin' => false,
-        ],
+                'identityClass' => 'common\models\User',
+                'enableAutoLogin' => false,
+            ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
@@ -31,17 +29,23 @@ return [
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
-            'enableStrictParsing' => true,
+            'enableStrictParsing' => false, // because of windows
             'showScriptName' => false,
             'rules' => [
                 [
                     'class' => 'yii\rest\UrlRule',
+                    'controller' => 'country',
+                    'tokens' => [
+                        '{id}' => '<id:\w+>'
+                    ]
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/country',
                     'tokens' => [
-                        '{id}' => '<id:\\w+>'
+                        '{id}' => '<id:\w+>'
                     ]
-
-                ]
+                ],
             ],
         ]
     ],
