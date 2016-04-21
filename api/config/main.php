@@ -1,4 +1,6 @@
 <?php
+use yii\web\Response;
+
 $params = array_merge(
     require(__DIR__ . '/params.php'),
     require(__DIR__ . '/params-local.php')
@@ -6,7 +8,15 @@ $params = array_merge(
 return [
     'id' => 'app-api',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => [
+        'log',
+        [
+            'class' => 'yii\filters\ContentNegotiator',
+            'formats' => array(
+                'text/html' => Response::FORMAT_JSON
+            ),
+        ],
+    ],
     'modules' => [
         'v1' => [
             'basePath' => '@app/modules/v1',

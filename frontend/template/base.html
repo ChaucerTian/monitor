@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>{%strip%}
+{%* 预定义全局变量 *%}
+{%$widgetsCss=array() scope="global"%}
+{%$widgetsJs=array() scope="global"%}
+{%* 提前捕获body部分，已获取widget的js和css *%}
+{%capture name="mainBody"%}{%block name="body"%}{%/block%}{%/capture%}{%/strip%}
+<head>
+    <meta charset="utf-8">
+    <title>{%block name="tilte"%}公司名称{%block%}</title>
+    {%block name="meta"%}
+    <meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="keywords" content="公司名称">
+    {%block name="meta_description"%}
+    {%/block%}
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    {%*禁止电话号为播放超链*%}{%*<meta content="telephone=no" name="format-detection">*%}
+    <meta http-equiv="Cache-Control" content="no-siteapp">{%* 禁用搜索浏览器自动转码*%}
+    {%/block%}
+    <link rel="shortcut icon" href="favicon.ico">
+
+    {%block name="css"%}
+    <style>[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide{display:none !important;}ng\:form{display:block;}.ng-animate-start{clip:rect(0,auto,auto,0);-ms-zoom:1.0001;}.ng-animate-active{clip:rect(-1px,auto,auto,0);-ms-zoom:1;}</style>
+    {%/block%}
+    {%foreach $widgetsCss as $css%}{%$css nofilter%}{%/foreach%}
+</head>
+<body>
+    {%$smarty.capture.mainBody nofilter%}
+    {%block name="footer"%}{%strip%}
+    <div class="footer">
+        <div class="icp container">
+            <p>
+                <a rel="nofollow" target="_blank" href="http://www.miibeian.gov.cn">京ICP证号</a>
+            </p>
+        </div>
+    </div>
+    {%block name="js"%}{%strip%}
+    <script src="http://apps.bdimg.com/libs/jquery/1.11.3/jquery.min.js"></script>
+    {%/strip%}{%/block%}
+    {%foreach $widgetsJs as $js%}{%$js nofilter%}{%/foreach%}
+</body>
+{%/strip%}
+</html>
