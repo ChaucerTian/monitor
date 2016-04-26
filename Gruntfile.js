@@ -115,7 +115,7 @@ module.exports = function(grunt) {
                         cwd: './backend/static/js',
                         src: ['*.min.js', '**/*.min.js', 'libs/**'],
                         dest: './backend/web/static/js/'
-                    }
+                    },
                 ]
             },
             css: {

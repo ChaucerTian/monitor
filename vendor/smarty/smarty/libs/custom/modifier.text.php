@@ -8,7 +8,7 @@ function smarty_modifier_text($string, $contentType='text') {
     $result = '';
     switch ($contentType) {
         case 'html':
-            $result = Yii::app()->htmlCleanHelper->clean($string);
+            $result = Yii::$app->htmlCleanHelper->clean($string);
             break;
         default:
             $result = htmlspecialchars($string, ENT_QUOTES);

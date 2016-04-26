@@ -18,7 +18,7 @@ class smarty3 extends Smarty {
      * @var array Add additional directories to Smarty's search path for plugins.
      */
     public $pluginDirs = [
-        '@vendor/smarty/smarty/custom'
+        '@vendor/smarty/smarty/libs/custom'
     ];
     /**
      * @var array Class imports similar to the use tag
@@ -63,6 +63,9 @@ class smarty3 extends Smarty {
         $this->left_delimiter = '{%';
         $this->right_delimiter = '%}';
 
+        foreach ($this->pluginDirs as &$plugin) {
+            $plugin = Yii::getAlias($plugin);
+        }
         $this->addPluginsDir($this->pluginDirs);
 
         // 打开默认过滤
@@ -85,8 +88,8 @@ class smarty3 extends Smarty {
         } else {
             if ($type === 'css' || $type === 'less') {
                 $ret = array(
-                    'realFile' => Yii::getAlias('@webroot') . '/assets/css/all.css',
-                    'webFile' => Yii::getAlias('@webroot') . $module . '/assets/css/all.css',
+                    'realFile' => Yii::getAlias('@webroot') . '/static/css/all.css',
+                    'webFile' => $module . '/static/css/all.css',
                     'type' => 'css',
                 );
             } elseif ($type === 'js') {

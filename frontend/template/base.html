@@ -7,7 +7,7 @@
 {%capture name="mainBody"%}{%block name="body"%}{%/block%}{%/capture%}{%/strip%}
 <head>
     <meta charset="utf-8">
-    <title>{%block name="tilte"%}公司名称{%block%}</title>
+    <title>{%block name="title"%}公司名称{%/block%}</title>
     {%block name="meta"%}
     <meta http-equiv="X-UA-Compatible" content="IE=EDGE">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -26,19 +26,30 @@
     {%foreach $widgetsCss as $css%}{%$css nofilter%}{%/foreach%}
 </head>
 <body>
-    {%$smarty.capture.mainBody nofilter%}
-    {%block name="footer"%}{%strip%}
-    <div class="footer">
-        <div class="icp container">
-            <p>
-                <a rel="nofollow" target="_blank" href="http://www.miibeian.gov.cn">京ICP证号</a>
-            </p>
-        </div>
+    <div class="body-wrap">
+        {%$smarty.capture.mainBody nofilter%}
+
+        {%block name="footer"%}{%strip%}
+        <footer class="footer">
+            <div class="icp container">
+                <p>
+                    <a rel="nofollow" target="_blank" href="http://www.miibeian.gov.cn">京ICP证号</a>
+                </p>
+            </div>
+        </footer>
+        {%/block%}
+        {%block name="js"%}{%strip%}
+        <script src="http://apps.bdimg.com/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="http://s1.bdstatic.com/r/www/cache/ecom/esl/2-0-2/esl.js"></script>
+        {%js file="static/js/config.js"%}
+        {%js file="static/js/amd/opt.js" production="true"%}
+        <script>
+            window.csrfToken='{%csrf%}';
+            require(['utils/csrf']);
+        </script>
+        {%/strip%}{%/block%}
+        {%foreach $widgetsJs as $js%}{%$js nofilter%}{%/foreach%}
     </div>
-    {%block name="js"%}{%strip%}
-    <script src="http://apps.bdimg.com/libs/jquery/1.11.3/jquery.min.js"></script>
-    {%/strip%}{%/block%}
-    {%foreach $widgetsJs as $js%}{%$js nofilter%}{%/foreach%}
 </body>
 {%/strip%}
 </html>

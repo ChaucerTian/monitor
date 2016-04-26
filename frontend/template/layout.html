@@ -1,0 +1,43 @@
+{%extends file="base.html"%}
+{%block name="body"%}
+
+{%block name="header"%}
+{%* 顶部导航 logo 用户信息*%}
+<nav class="body-head" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">公司名称</a>
+        </div>
+        <div class="navbar-collapse">
+            <ul class="navbar-nav">
+                <li><a href="/">主页</a></li>
+                <li><a href="/introduction">系统介绍</a></li>
+                <li><a href="/cases">竞品案例</a></li>
+                <li><a href="/cases">用户中心</a></li>
+                <li><a href="/cases">联系我们</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{%/block%}
+
+{%block name="banner"%}{%/block%}
+
+{%block name="content"%}
+<div class="container">
+    {%block name="main"%}
+    {%/block%}
+</div>
+{%/block%}
+
+{%/block%}
+
+{%block name="css" append%}
+{%/block%}
+{%block name="js" append%}
+{%/block%}

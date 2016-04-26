@@ -13,10 +13,10 @@
  */
 
 function smarty_compiler_js($params, Smarty $smarty) {
-    if ($params['debug'] && YII_DEBUG===false) {
+    if (isset($params['debug']) && $params['debug'] && YII_DEBUG===false) {
         return false;
     }
-    if ($params['production'] && YII_DEBUG===true) {
+    if (isset($params['production']) && $params['production'] && YII_DEBUG===true) {
         return false;
     }
 

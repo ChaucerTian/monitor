@@ -15,7 +15,7 @@ function smarty_block_customCache($params, $content, Smarty_Internal_Template $t
         if (YII_DEBUG) {
             return;
         }
-        $content = Yii::app()->cache->get($params['id']);
+        $content = Yii::$app->cache->get($params['id']);
         if ($content) {
             $repeat = false;
             return $content;
@@ -25,7 +25,7 @@ function smarty_block_customCache($params, $content, Smarty_Internal_Template $t
         if ($expire <= 0) {
             $expire = 60;
         }
-        Yii::app()->cache->set($params['id'], $content, $expire);
+        Yii::$app->cache->set($params['id'], $content, $expire);
         return $content;
     }
 }
