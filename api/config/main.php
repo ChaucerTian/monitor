@@ -43,7 +43,7 @@ return [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => false, // because of windows
             'showScriptName' => false,
-            'rules' => require_once(dirname(__FILE__) . '/route.php'),
+            'rules' => require(dirname(__FILE__) . '/route.php'),
         ]
     ],
     'params' => $params,

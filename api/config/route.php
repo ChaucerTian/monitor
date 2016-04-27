@@ -20,7 +20,11 @@ return array(
             '{id}' => '<id:\w+>'
         ]
     ],
-    [
-        ''
-    ]
+    'GET user' => 'v1/user/country',
+//    [
+//        'v1.0/user/token',
+//        'pattern' => 'v1.0/user/key/username/<username:\w+>/pass/<pass:\w+>/',
+//    ],
+    '<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
+    '<module:\w+>/<controller:\w+>/<action:\w+>'=>'<module>/<controller>/<action>',
 );

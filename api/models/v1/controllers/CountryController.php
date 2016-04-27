@@ -19,14 +19,14 @@ class CountryController extends ActiveController
         $behaviors = parent::behaviors();
         $behaviors['contentNegotiator']['formats']['text/html'] = Response::FORMAT_JSON;
 
-        $behaviors['authenticator'] = [
-            'class' => CompositeAuth::className(),
-            'authMethods' => [
-                HttpBasicAuth::className(),
+//        $behaviors['authenticator'] = [
+//            'class' => CompositeAuth::className(),
+//            'authMethods' => [
+//                HttpBasicAuth::className(),
 //                HttpBearerAuth::className(),
 //                QueryParamAuth::className(),
-            ],
-        ];
+//            ],
+//        ];
 
         return $behaviors;
     }
