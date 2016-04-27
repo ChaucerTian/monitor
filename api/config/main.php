@@ -25,9 +25,11 @@ return [
     ],
     'components' => [
         'user' => [
-                'identityClass' => 'common\models\User',
-                'enableAutoLogin' => false,
-            ],
+            'identityClass' => 'common\models\User',
+            'enableAutoLogin' => false,
+            'enableSession' => false,
+            'loginUrl' => null,
+        ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
@@ -41,22 +43,7 @@ return [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => false, // because of windows
             'showScriptName' => false,
-            'rules' => [
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'country',
-                    'tokens' => [
-                        '{id}' => '<id:\w+>'
-                    ]
-                ],
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/country',
-                    'tokens' => [
-                        '{id}' => '<id:\w+>'
-                    ]
-                ],
-            ],
+            'rules' => require_once(dirname(__FILE__) . '/route.php'),
         ]
     ],
     'params' => $params,

@@ -3,6 +3,10 @@ namespace app\modules\v1\controllers;
 
 use yii\rest\ActiveController;
 use yii\web\Response;
+use yii\filters\auth\CompositeAuth;
+use yii\filters\auth\HttpBasicAuth;
+use yii\filters\auth\HttpBearerAuth;
+use yii\filters\auth\QueryParamAuth;
 
 /**
  * Country Controller API
@@ -14,6 +18,16 @@ class CountryController extends ActiveController
     {
         $behaviors = parent::behaviors();
         $behaviors['contentNegotiator']['formats']['text/html'] = Response::FORMAT_JSON;
+
+        $behaviors['authenticator'] = [
+            'class' => CompositeAuth::className(),
+            'authMethods' => [
+                HttpBasicAuth::className(),
+//                HttpBearerAuth::className(),
+//                QueryParamAuth::className(),
+            ],
+        ];
+
         return $behaviors;
     }
 
