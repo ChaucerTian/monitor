@@ -7,8 +7,10 @@ use yii\filters\auth\CompositeAuth;
 use yii\filters\auth\HttpBasicAuth;
 use common\filters\auth\HttpBasicParamAuth;
 use common\models\User;
+use common\models\AuthToken;
 use app\modules\v1\models\Country;
 use yii\web\Response;
+use app\modules\v1\managers\AuthTokenManager;
 
 /**
  * USER Controller
@@ -21,14 +23,19 @@ class UserController extends Controller {
     public function behaviors() {
         $behaviors = parent::behaviors();
         $behaviors['contentNegotiator']['formats']['text/html'] = Response::FORMAT_JSON;
-//        $behaviors['authenticator'] = [
-//            'class' => HttpBasicParamAuth::className(),
-//            'auth' => [$this, 'auth'],
-//        ];
+        $behaviors['authenticator'] = [
+            'class' => HttpBasicParamAuth::className(),
+            'auth' => [$this, 'auth'],
+        ];
 
         return $behaviors;
     }
 
+    /**
+     * @param $username
+     * @param $password
+     * @return null|static
+     */
     public function auth($username, $password) {
         $user = User::findByUsername($username);
         if ($user !== null && $user->validatePassword($password)) {
@@ -37,13 +44,28 @@ class UserController extends Controller {
         return null;
     }
 
+    /**
+     * @return null|static
+     */
     public function actionKey() {
         $request = Yii::$app->getRequest();
-        $username = $request->get($this->usernameParam);
-        $username = $username ? $username : $request->getBodyParam($this->usernameParam);
-        return User::findByUsername($username);
-    }
-    public function actionCountry() {
-        return Country::find();
+        if ($request->isGet) {
+            $username = $request->get($this->usernameParam);
+            $username = $username ? $username : $request->getBodyParam($this->usernameParam);
+            $token = AuthTokenManager::instance()->getAuthTokenByName($username);
+            return array(
+                'errcode' => 0,
+                'errmsg' => '',
+                'key' => $token,
+            );
+        } else {
+            Yii::$app->response->statusCode = 405;
+            return array(
+                'errcode' => 10001,
+                'errmsg' => 'method not allowed',
+                'key' => ''
+            );
+        }
+
     }
 }

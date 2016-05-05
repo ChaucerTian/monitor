@@ -12,7 +12,7 @@ class HttpBasicParamAuth extends AuthMethod {
     /**
      * @var string the param name for passing user name
      */
-    public $usernameParam = 'user';
+    public $usernameParam = 'username';
     /**
      * @var string the param name for passing user password
      */
@@ -39,7 +39,7 @@ class HttpBasicParamAuth extends AuthMethod {
         $password = $request->get($this->passwordParam);
         $password = $password ? $password : $request->getBodyParam($this->passwordParam);
 
-        $token = $request->getHeaders()->get('token');
+        $token = $request->getHeaders()->get($this->tokenParam);
         $token = $token ? $token : $request->get($this->tokenParam);
         $token = $token ? $token : $request->getBodyParam($this->tokenParam);
 
@@ -53,7 +53,7 @@ class HttpBasicParamAuth extends AuthMethod {
                 }
                 return $identity;
             }
-        } else if ($username !== null && $token !== null) {
+        } else if ($token !== null) {
             $identity = $user->loginByAccessToken($token, get_class($this));
             if ($identity === null) {
                 $this->handleFailure($response);

@@ -44,7 +44,13 @@ return [
             'enableStrictParsing' => false, // because of windows
             'showScriptName' => false,
             'rules' => require(dirname(__FILE__) . '/route.php'),
-        ]
+        ],
+        'request' => [
+            'parsers' => array(
+                'application/json' => 'yii\web\JsonParser',
+            ),
+        ],
+        // todo error handler
     ],
     'params' => $params,
 ];

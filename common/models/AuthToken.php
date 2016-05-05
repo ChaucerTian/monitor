@@ -1,9 +1,9 @@
 <?php
+namespace common\models;
 /**
  * AuthToken Model
  * User: Chaucer Tian (tianqingshuai@gmail.com)
  * Date: 2016/4/27
- * Time: 14:32
  */
 
 use Yii;

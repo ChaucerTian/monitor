@@ -20,11 +20,16 @@ return array(
             '{id}' => '<id:\w+>'
         ]
     ],
-    'GET user' => 'v1/user/country',
-//    [
-//        'v1.0/user/token',
-//        'pattern' => 'v1.0/user/key/username/<username:\w+>/pass/<pass:\w+>/',
-//    ],
+
+    'GET v1/projects' => 'v1/project/index',
+    'POST v1/projects' => 'v1/project/create',
+    'PUT v1/project/<id:\d+>' => 'v1/project/update',
+    'GET v1/project/<id:\d+>' => 'v1/project/view',
+    'DELETE v1/project<id:\d+>' => 'v1/project/delete',
+
+
+    'user' => 'v1/user/country',
+
     '<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
     '<module:\w+>/<controller:\w+>/<action:\w+>'=>'<module>/<controller>/<action>',
 );
