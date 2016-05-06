@@ -1,21 +1,22 @@
 <?php
 /**
- *
+ * Device Controller
  * Author: Chaucer Tian (tqignshuai@gmail.com)
- * Date: 2016/5/4
+ * Date: 2016/5/6
  */
 
 namespace app\modules\v1\controllers;
 
-use common\filters\auth\HttpBasicParamAuth;
-use common\filters\auth\HttpBasicTokenAuth;
+use app\models\Device;
+use app\modules\v1\managers\DeviceManager;
 use Yii;
 use yii\base\Exception;
 use yii\rest\Controller;
 use yii\web\Response;
-use app\modules\v1\managers\ProjectManager;
+use common\filters\auth\HttpBasicParamAuth;
 
-class ProjectController extends Controller {
+class DeviceController extends Controller {
+
     public function behaviors() {
         $behaviors = parent::behaviors();
         $behaviors['contentNegotiator']['formats']['text/html'] = Response::FORMAT_JSON;
@@ -27,13 +28,13 @@ class ProjectController extends Controller {
         return $behaviors;
     }
 
-    public function actionIndex() {
+    public function actionIndex($projectId) {
         $page = Yii::$app->request->get('page', 1);
         $pageSize = Yii::$app->request->get('pageSize', 10);
 
-        $result = ProjectManager::instance()->all($page, $pageSize);
+        $result = DeviceManager::instance()->all($projectId, $page, $pageSize);
         $pagination = $result['pagination'];
-        $projects = $result['projects'];
+        $devices = $result['devices'];
 
         Yii::$app->response->getHeaders()
             ->set('X-Pagination-Total-Count', $pagination['totalCount'])
@@ -41,25 +42,26 @@ class ProjectController extends Controller {
             ->set('X-Pagination-Current-Page', $pagination['currentPage'])
             ->set('X-Pagination-Per-Page', $pagination['pageSize']);
 
-        return $projects;
+        return $devices;
     }
 
-    public function actionCreate() {
+    public function actionCreate($projectId) {
         $post = Yii::$app->request->post();
         $response = Yii::$app->getResponse();
 
-        if (isset($post['name'])) {
+        if (isset($post['program_version']) && isset($post['name'])) {
             try {
-                $result = ProjectManager::instance()->create($post);
+                $result = DeviceManager::instance()->create($projectId, $post);
                 $response->setStatusCode(201);
-                return array('id' => $result['id']);
+                return array(
+                    'id' => $result['id'],
+                );
             } catch (Exception $e) {
                 $response->setStatusCode(500);
-                $result = array(
+                return array(
                     'errmsg' => 'server error',
                 );
             }
-            return $result;
         } else {
             $response->setStatusCode(400);
             return array(
@@ -68,9 +70,9 @@ class ProjectController extends Controller {
         }
     }
 
-    public function actionView($id) {
+    public function actionView($projectId, $id) {
         $response = Yii::$app->getResponse();
-        $result = ProjectManager::instance()->view($id);
+        $result = DeviceManager::instance()->view($projectId, $id);
         if ($result) {
             return $result;
         } else {
@@ -78,14 +80,16 @@ class ProjectController extends Controller {
         }
     }
 
-    public function actionUpdate($id) {
+    public function actionUpdate($projectId, $id) {
         $post = Yii::$app->request->post();
         $response = Yii::$app->getResponse();
         try {
-            $result = ProjectManager::instance()->update($id, $post);
+            $result = DeviceManager::instance()->update($projectId, $id, $post);
             if ($result) {
                 $response->setStatusCode(200);
-                $response->getHeaders()->set('id', $result['id']);
+                $response->getHeaders()
+                    ->set('id', $result['id'])
+                    ->set('project_id', $projectId);
             } else {
                 $response->setStatusCode(404);
             }
@@ -97,10 +101,10 @@ class ProjectController extends Controller {
         }
     }
 
-    public function actionDelete($id) {
+    public function actionDelete($projectId, $id) {
         $response = Yii::$app->getResponse();
         try {
-            $result = ProjectManager::instance()->delete($id);
+            $result = DeviceManager::instance()->delete($projectId, $id);
             if ($result) {
                 $response->setStatusCode(204);
             } else {
@@ -108,9 +112,8 @@ class ProjectController extends Controller {
             }
         } catch (Exception $e) {
             $response->setStatusCode(500);
-            return array(
-                'errmsg' => 'server error',
-            );
+            return array('errmsg' => 'server error');
         }
     }
+
 }

@@ -11,6 +11,7 @@ namespace app\modules\v1\managers;
 use Yii;
 use app\models\Project;
 use common\managers\Manager;
+use yii\base\Exception;
 
 class ProjectManager extends Manager {
     /**
@@ -24,6 +25,12 @@ class ProjectManager extends Manager {
     }
 
 
+    /**
+     * return project list with pagination
+     * @param int $page
+     * @param int $pageSize
+     * @return array
+     */
     public function all($page=1, $pageSize=20) {
         $count = Yii::$app->db->createCommand('SELECT COUNT(1) FROM `project` WHERE 1')->queryScalar();
 
@@ -88,6 +95,57 @@ class ProjectManager extends Manager {
             );
         } else {
             return null;
+        }
+    }
+
+    /**
+     * update a project
+     * @param $id
+     * @param $content
+     * @return array|bool
+     * @throws ServerErrorHttpException
+     */
+    public function update($id, $content) {
+        $project = Project::findOne(['id' => $id]);
+        if (!$project) {
+            return false;
+        }
+        $project->name = isset($content['name']) ? $content['name'] : $project->name;
+        $project->description = isset($content['description']) ? $content['description'] : $project->description;
+        $project->contact = isset($content['contact']) ? $content['contact'] : $project->contact;
+        $project->location = isset($content['location']) ? json_encode($content['location'])
+            : $project->location;
+
+        if ($project->save()) {
+            return array('id' => $project->id);
+        } else {
+            throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
+        }
+    }
+
+    /**
+     * delete project
+     * @param $id
+     * @return bool
+     * @throws \Exception
+     * @throws \yii\db\Exception
+     */
+    public function delete($id) {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $command = Yii::$app->db->createCommand('DELETE FROM `project` WHERE id=:id');
+            $result = $command->bindParam(':id', $id)->execute();
+
+            if ($result != 1) {
+                $transaction->rollBack();
+                return false;
+            } else {
+                $transaction->commit();
+                return true;
+            }
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            throw $e;
         }
     }
 }
