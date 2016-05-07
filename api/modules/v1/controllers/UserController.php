@@ -53,6 +53,9 @@ class UserController extends Controller {
             $username = $request->get($this->usernameParam);
             $username = $username ? $username : $request->getBodyParam($this->usernameParam);
             $token = AuthTokenManager::instance()->getAuthTokenByName($username);
+            if (!$token) {
+                $token = AuthTokenManager::instance()->addToken($username);
+            }
             return array(
                 'errcode' => 0,
                 'errmsg' => '',

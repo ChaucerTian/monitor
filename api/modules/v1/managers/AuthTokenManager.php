@@ -5,6 +5,8 @@ use common\models\AuthToken;
 use Yii;
 use common\managers\Manager;
 use common\models\User;
+use yii\base\Exception;
+
 /**
  * AuthToken Manager
  * Author: Chaucer Tian (tqignshuai@gmail.com)
@@ -36,6 +38,19 @@ class AuthTokenManager extends Manager {
         return $token ? $token['token'] : false;
     }
 
+    public function addTokenByUsername($username) {
+        $user = User::findOne(array('username' => $username));
+        if (empty($user)) {
+            return false;
+        }
+        $token = Yii::$app->security->generateRandomString();
+        $authToken = new AuthToken();
+        $authToken->user_id = $user->id;
+        $authToken->token = $authToken;
+        $authToken->create_time = date('Y-m-d H:i:s', time());
+        $authToken->save();
+        return $authToken;
+    }
     /**
      * Update auth token according to username
      * @param $userName
