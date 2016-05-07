@@ -49,12 +49,13 @@ class PointController extends Controller {
 
         if (isset($post['name'])) {
             try {
-                $result = PointManager::instance()->create($projectId, $deviceId);
+                $result = PointManager::instance()->create($projectId, $deviceId, $post);
                 $response->setStatusCode(201);
                 return array('id' => $result['id']);
             } catch (Exception $e) {
                 $response->setStatusCode(500);
                 return array(
+//                    'errmsg' => $e->getMessage(),
                     'errmsg' => 'server error',
                 );
             }
@@ -71,7 +72,7 @@ class PointController extends Controller {
         $response = Yii::$app->getResponse();
 
         try {
-            $result = PointManager::instance()->update($projectId, $id, $post);
+            $result = PointManager::instance()->update($projectId, $deviceId, $id, $post);
             if ($result) {
                 $response->setStatusCode(200);
                 $response->getHeaders()
@@ -107,7 +108,7 @@ class PointController extends Controller {
 
     public function actionTrend($projectId, $deviceId, $id) {
         $response = Yii::$app->getResponse();
-        $start = Yii::$app->request->get('start', false);
+        $start = Yii::$app->request->get('start', date('Y-m-d H:i:s', strtotime('2000-1-1 00:00:00')));
         $end = Yii::$app->request->get('end', date('Y-m-d H:i:s', time()));
         $interval = Yii::$app->request->get('interval', 1);
         $page = Yii::$app->request->get('page', 1);
@@ -124,5 +125,20 @@ class PointController extends Controller {
             ->set('X-Pagination-Per-Page', $pagination['pageSize']);
 
         return $data;
+    }
+
+    public function actionDelete($projectId, $id) {
+        $response = Yii::$app->getResponse();
+        try {
+            $result = PointManager::instance()->delete($projectId, $id);
+            if ($result) {
+                $response->setStatusCode(204);
+            } else {
+                $response->setStatusCode(404);
+            }
+        } catch (Exception $e) {
+            $response->setStatusCode(500);
+            return array('errmsg' => 'server error');
+        }
     }
 }

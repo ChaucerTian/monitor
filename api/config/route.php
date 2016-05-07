@@ -38,7 +38,7 @@ return array(
     'GET v1/project/<projectId:\d+>/device/<deviceId:\d+>/datapoint/<id:\d+>' => 'v1/point/view',
     'GET v1/project/<projectId:\d+>/device/<deviceId:\d+>/datapoint/<id:\d+>.json' => 'v1/point/trend',
     'GET v1/project/<projectId:\d+>/device/<deviceId:\d+>/datapoints' => 'v1/point/index',
-
+    'DELETE v1/project/<projectId:\d+>/device/<deviceId:\d+>/datapoint/<id:\d+>' => 'v1/point/delete',
 
     'user' => 'v1/user/country',
 

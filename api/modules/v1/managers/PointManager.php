@@ -34,7 +34,7 @@ class PointManager extends Manager {
         $totalPage = intval(($count + $pageSize - 1) / $pageSize);
         $offset = ($page - 1) * $pageSize;
 
-        $command = Yii::$app->db->createCommand('SELECT id, type, status, timestamp, value
+        $command = Yii::$app->db->createCommand('SELECT id, type, status, `timestamp`, value
             FROM point WHERE project_id=:project_id AND device_id=:device_id LIMIT :offset, :limit');
         $command->bindParam(':project_id', $projectId);
         $command->bindParam(':device_id', $deviceId);
@@ -43,7 +43,7 @@ class PointManager extends Manager {
         $result = $command->queryAll();
 
         foreach ($result as &$item) {
-            $result['timestamp'] = date('c', $item['timestamp']);
+            $item['timestamp'] = date('c', strtotime($item['timestamp']));
         }
 
         return array(
@@ -64,14 +64,14 @@ class PointManager extends Manager {
         $point->device_id = $deviceId;
         $point->type = $content['type'];
         $point->value = $content['value'];
-        $point->status = $content['status'];
-        $point->timstamp = strtotime($content['timestamp']);
+        $point->status = isset($content['status']) ? intval($content['status']) : 0;
+        $point->timestamp = strtotime($content['timestamp']);
         $point->create_time = date('Y-m-d H:i:s', time());
         if ($point->save()) {
             $trend = new Trend();
             $trend->point_id = $point->id;
             $trend->value = $content['value'];
-            $trend->timestamp = strtotime($content['timestamp']);
+            $trend->timestamp = date("Y-m-d H:i:s", strtotime($content['timestamp']));
             $trend->save();
             return array('id' => $point->id);
         } else {
@@ -91,8 +91,8 @@ class PointManager extends Manager {
         }
         $point->type = isset($content['type']) ? intval($content['type']) : $point->type;
         $point->status = isset($content['status']) ? intval($content['status']) : $point->status;
-        $point->timestamp = isset($content['timestamp']) ? strtotime($content['timestamp'])
-            : $point->timestamp;
+        $point->timestamp = isset($content['timestamp']) ? date("Y-m-d H:i:s", strtotime($content['timestamp']))
+            : date("Y-m-d H:i:s", strtotime($point->timestamp));
         $point->value = isset($content['value']) ? $content['value'] : $point->value;
 
         if ($point->save()) {
@@ -116,7 +116,7 @@ class PointManager extends Manager {
                 'id' => $point->id,
                 'type' => $point->type,
                 'value' => $point->value,
-                'timestamp' => date('c', $point->timestamp),
+                'timestamp' => date('c', strtotime($point->timestamp)),
             );
         } else {
             return null;
@@ -128,7 +128,7 @@ class PointManager extends Manager {
         if ($point) {
             return array(
                 'value' => $point->value,
-                'timestamp' => date('c', $point->timestamp),
+                'timestamp' => date('c', strtotime($point->timestamp)),
             );
         } else {
             return null;
@@ -136,8 +136,8 @@ class PointManager extends Manager {
     }
 
     public function viewTrend($id, $start, $end, $interval, $page=1, $pageSize=100) {
-        $start = strtotime($start);
-        $end = strtotime($end);
+        $start = date('Y-m-d H:i:s', strtotime($start));
+        $end = date('Y-m-d H:i:s', strtotime($end));
         $first = Yii::$app->db->createCommand('SELECT * FROM trend WHERE timestamp > :start
             ORDER BY `timestamp` ASC LIMIT 1')->bindParam(':start', $start)->queryOne();
         if (!$first) {
@@ -147,10 +147,10 @@ class PointManager extends Manager {
             $count = 0;
         } else {
             $startTimestamp = $first['timestamp'];
-            $command = Yii::$app->db->createCommand('SELECT count(1) FROM trend
+            $command = Yii::$app->db->createCommand('SELECT COUNT(1) FROM (SELECT `id` FROM trend
                 WHERE `timestamp`>=:start and `timestamp`<=:end and point_id=:id
-                AND (`timestamp`-:start)%interval=0 GROUP BY `timestamp` ORDER BY `timestamp` ASC');
-            $command->bindParam(':start', $start);
+                AND (`timestamp`-:start)%:interval=0 GROUP BY `timestamp` ORDER BY `timestamp` ASC) as temp');
+            $command->bindParam(':start', $startTimestamp);
             $command->bindParam(':end', $end);
             $command->bindParam(':id', $id);
             $command->bindParam(':interval', $interval);
@@ -160,9 +160,9 @@ class PointManager extends Manager {
 
             $command = Yii::$app->db->createCommand('SELECT `timestamp`, `value` FROM trend
                 WHERE `timestamp`>=:start and `timestamp`<=:end and point_id=:id
-                AND (`timestamp`-:start)%interval=0 GROUP BY `timestamp` ORDER BY `timestamp` ASC
+                AND (`timestamp`-:start)%:interval=0 GROUP BY `timestamp` ORDER BY `timestamp` ASC
                 LIMIT :offset, :limit');
-            $command->bindParam(':start', $start);
+            $command->bindParam(':start', $startTimestamp);
             $command->bindParam(':end', $end);
             $command->bindParam(':id', $id);
             $command->bindParam(':interval', $interval);
@@ -171,7 +171,7 @@ class PointManager extends Manager {
             $result = $command->queryAll();
         }
         return array(
-            'devices' => $result,
+            'data' => $result,
             'pagination' => array(
                 'totalCount' => $count,
                 'pageSize' => $pageSize,
@@ -180,5 +180,27 @@ class PointManager extends Manager {
                 'currentPage' => $page,
             ),
         );
+    }
+
+    public function delete($projectId, $deviceId, $id) {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $command = Yii::$app->db->createCommand('DELETE FROM point WHERE project_id=:project_id
+                and device_id=:device_id and id=:id');
+            $command->bindParam(':id', $id);
+            $command->bindParam(':project_id', $projectId);
+            $command->bindParam(':device_id', $deviceId);
+            $result = $command->execute();
+            if ($result != 1) {
+                $transaction->rollBack();
+                return false;
+            } else {
+                $transaction->commit();
+                return true;
+            }
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
     }
 }
