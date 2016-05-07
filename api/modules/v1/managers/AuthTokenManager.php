@@ -49,7 +49,7 @@ class AuthTokenManager extends Manager {
         $authToken->token = $authToken;
         $authToken->create_time = date('Y-m-d H:i:s', time());
         $authToken->save();
-        return $authToken;
+        return $token;
     }
     /**
      * Update auth token according to username
