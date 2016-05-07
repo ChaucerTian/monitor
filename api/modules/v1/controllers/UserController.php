@@ -54,7 +54,7 @@ class UserController extends Controller {
             $username = $username ? $username : $request->getBodyParam($this->usernameParam);
             $token = AuthTokenManager::instance()->getAuthTokenByName($username);
             if (!$token) {
-                $token = AuthTokenManager::instance()->addToken($username);
+                $token = AuthTokenManager::instance()->addTokenByUsername($username);
             }
             return array(
                 'errcode' => 0,
