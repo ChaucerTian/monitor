@@ -46,7 +46,7 @@ class AuthTokenManager extends Manager {
         $token = Yii::$app->security->generateRandomString();
         $authToken = new AuthToken();
         $authToken->user_id = $user->id;
-        $authToken->token = $authToken;
+        $authToken->token = $token;
         $authToken->create_time = date('Y-m-d H:i:s', time());
         $authToken->save();
         return $token;
