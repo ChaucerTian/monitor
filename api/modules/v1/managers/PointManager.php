@@ -99,7 +99,7 @@ class PointManager extends Manager {
             if (isset($content['value']) && isset($content['timestamp'])) {
                 $trend = new Trend();
                 $trend->point_id = $point->id;
-                $trend->timestamp = strtotime($content['timestamp']);
+                $trend->timestamp = date('Y-m-d H:i:s', strtotime($content['timestamp']));
                 $trend->value = $content['value'];
                 $trend->save();
             }
